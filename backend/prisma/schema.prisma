@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  phone        String   @unique
+  role         String   // driver | station | admin
+  vehicle      Vehicle?
+  transactions FuelTransaction[]
+  reservations Reservation[]
+}
+
+model Vehicle {
+  id           String   @id @default(cuid())
+  plateNumber  String   @unique
+  owner        User     @relation(fields: [ownerId], references: [id])
+  ownerId      String
+  fuelType     String
+  dailyLimit   Float
+}
+
+model Station {
+  id            String   @id @default(cuid())
+  name          String
+  location      String
+  fuelCapacity  Float
+  currentStock  Float
+  refills       FuelRefill[]
+  transactions  FuelTransaction[]
+  reservations  Reservation[]
+}
+
+model FuelTransaction {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  station    Station  @relation(fields: [stationId], references: [id])
+  stationId  String
+  liters     Float
+  timestamp  DateTime @default(now())
+}
+
+model FuelRefill {
+  id          String   @id @default(cuid())
+  station     Station  @relation(fields: [stationId], references: [id])
+  stationId   String
+  litersAdded Float
+  source      String
+  timestamp   DateTime @default(now())
+}
+
+model Reservation {
+  id             String   @id @default(cuid())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String
+  station        Station  @relation(fields: [stationId], references: [id])
+  stationId      String
+  litersReserved Float
+  status         String   // pending | approved | completed | cancelled
+}
