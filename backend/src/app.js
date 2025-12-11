@@ -8,6 +8,7 @@ import refillRoutes from './routes/refillRoutes.js';
 import reservationRoutes from './routes/reservationRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import authRoutes from "./routes/authRoutes.js";
 
 
 dotenv.config();
@@ -27,6 +28,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/refills', refillRoutes);
 app.use('/api/reservations', reservationRoutes);
 app.use('/api/reports', reportRoutes);
+app.use("/api/auth", authRoutes);
 app.use(errorHandler);
 
 
